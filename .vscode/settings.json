@@ -9,5 +9,6 @@
   "files.watcherExclude": {
     "**/.fvm": true
   },
-  "cSpell.words": ["riverpod"]
+  "cSpell.words": ["riverpod"],
+  "dart.lineLength": 250
 }
