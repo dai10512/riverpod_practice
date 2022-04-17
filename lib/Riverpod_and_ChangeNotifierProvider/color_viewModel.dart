@@ -8,7 +8,7 @@ class Color extends ChangeNotifier {
   int get colorNumber => _colorNumber;
 
   void changeColor() {
-    if (colorNumber == 18) {
+    if (colorNumber == 17) {
       _colorNumber = 0;
     } else {
       _colorNumber++;
