@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_sample/riverpod_and_changeNotifier/color_viewModel.dart';
-import 'package:riverpod_sample/riverpod_and_changeNotifier/counter_viewModel.dart';
+import 'package:riverpod_sample/riverpod_and_changeNotifierProvider/color_viewModel.dart';
+import 'package:riverpod_sample/riverpod_and_changeNotifierProvider/counter_viewModel.dart';
 
 // A Counter example implemented with riverpod
 
