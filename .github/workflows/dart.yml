@@ -1,43 +1,136 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+name: flutter analyze
 
-name: Dart
-
+# トリガーを定義
 on:
-  push:
-    branches: [ master ]
+  # プルリク作成がトリガー(GitHub Actionsが実行される)となる
   pull_request:
-    branches: [ master ]
+    # プルリク作成時とプルリクにコミットが行われた時
+    types: [opened, synchronize]
+    # 対象ブランチを指定
+    branches:
+      - develop
 
+  # GitHubページから手動で実行できる
+  workflow_dispatch:
+
+# 実行するジョブを定義
 jobs:
-  build:
+  # ジョブ名を設定
+  flutter_analyze:
+
+    # ジョブを実行する仮想ホストマシンタイプ
     runs-on: ubuntu-latest
 
+    # タイムアウト時間を設定
+    timeout-minutes: 5
+
+    # steps配下に実行したいアクションを定義します。(usesもしくはrunを使用することになると思います)
+    # uses ・・・ GitHubやサードパーティで用意されているactionを使用できます
+    # run ・・・ 実行コマンド
     steps:
-      - uses: actions/checkout@v3
+　　　　　　　　　　　　  # 該当リポジトリにチェックアウト
+      - name: checkout
+        uses: actions/checkout@v2
 
-      # Note: This workflow uses the latest stable version of the Dart SDK.
-      # You can specify other versions if desired, see documentation here:
-      # https://github.com/dart-lang/setup-dart/blob/main/README.md
-      # - uses: dart-lang/setup-dart@v1
-      - uses: dart-lang/setup-dart@9a04e6d73cca37bd455e0608d7e5092f881fd603
+　　　　　　　　　　　　  # flutterインストール（キャッシュする）
+      - name: flutter cache
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "2.8.1"
+          channel: "stable"
+          cache: true
+          cache-key: flutter
+          cache-path: ${{ runner.tool_cache }}/flutter
 
-      - name: Install dependencies
-        run: dart pub get
-#         run: flutter pub get
+      - name: install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "2.8.1"
+          channel: "stable"
 
-      # Uncomment this step to verify the use of 'dart format' on each commit.
-      # - name: Verify formatting
-      #   run: dart format --output=none --set-exit-if-changed .
+　　　　　　　　　　　　　　 # flutter versionの確認
+      - name: flutter version
+        run: flutter --version
 
-      # Consider passing '--fatal-infos' for slightly stricter analysis.
-      - name: Analyze project source
-        run: dart analyze
+      　　 # flutter pub get 実行
+      - name: flutter pub get
+        run: flutter pub get
 
-      # Your project will need to have tests in test/ and a dependency on
-      # package:test for this step to succeed. Note that Flutter projects will
-      # want to change this to 'flutter test'.
-      - name: Run tests
-        run: dart test
+        # 静的解析の実行
+      - name: flutter analyze
+        run: flutter analyze
+動作確認
+作業ブランチからdevelopブランチにプルリクを作成すると、定義したワークフローが実行されていることがわかります。
+スクリーンショット 2022-01-30 1.10.10.png
+
+Detailsをクリックすると、Actionsページに遷移し、実行状況や判定結果を確認できます。
+添付画像では、全ての動作が問題なく実行されています。(静的解析も問題なし)
+※各タブを開くと、アクションの詳細を確認することもできます。
+スクリーンショット 2022-01-30 11.54.56.png
+
+動作が完了しプルリクページに戻ると、All checks have passedとなり、全てのチェックに合格したことがわかります。
+スクリーンショット 2022-01-30 12.01.25.png
+
+実行内容に不備や問題がある場合もActionsページで確認できます。
+※添付画像では、flutter analyze実行時にlib/main.dartに問題があることを指摘してくれています。(avoid_print)
+スクリーンショット 2022-01-30 12.53.27.png
+
+まとめ
+GitHub ActionsのCI機能を利用して、静的解析を自動化してみました。
+導入前は、flutter analyzeの実行忘れが発生していましたが、自動化することにより対策が出来き良かったと思います。
+今回、実装した静的解析は比較的簡単に導入でき、確認漏れも防ぐことができるのでプロジェクト作成時に導入した機能の一つだと感じました。
+まだまだ機能を一部しか活用できていないので、今後も学習を続けていきたいと思います。
+
+参考にした記事とドキュメント
+GitHub Actionsのワークフロー構文 - GitHub Docs
+https://docs.github.com
+
+
+Flutter action - GitHub Marketplace
+https://github.com
+
+
+【Flutter】GitHubActionsでテストと静的解析を自動化する - Qiita
+https://qiita.com
+
+
+Github ActionsでAndroidアプリのCI/CDをやってみた - えんじにあ雑記！
+https://www.mum-meblog.com
+
+
+Github Actionsの使い方メモ - Qiita
+https://qiita.com
+
+
+
+
+ユーザー登録して、Qiitaをもっと便利に使ってみませんか。
+ユーザー登録
+ログイン
+NishiKeiqiita
+Keita Nishikawa
+@NishiKeiqiita
+フォロー
+axiaworks
+Axia Works LLC
+Axia Works合同会社。 アプリの開発をメインにしています。
+https://axia-works.com/
+フォロー
+
+
+コメント
+
+この記事にコメントはありません。
+あなたもコメントしてみませんか :)
+ユーザー登録
+すでにアカウントを持っている方はログイン
+記事投稿イベント開催中
+
+データに関する記事を書こう！
+2022/03/14~2022/04/30
+
+新人プログラマ応援 - みんなで新人を育てよう！
+2022/03/28~2022/04/30
+すべて見る
+
+5
