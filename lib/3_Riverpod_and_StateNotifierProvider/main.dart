@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_sample/riverpod_and_changeNotifierProvider/color_viewModel.dart';
-import 'package:riverpod_sample/riverpod_and_changeNotifierProvider/counter_viewModel.dart';
-
-// A Counter example implemented with riverpod
-
+import 'package:riverpod_sample/3_Riverpod_and_StateNotifierProvider/models/color_state.dart';
+import 'package:riverpod_sample/3_Riverpod_and_StateNotifierProvider/models/counter_state.dart';
+import 'package:riverpod_sample/3_Riverpod_and_StateNotifierProvider/stateController/color_controller.dart';
+import 'package:riverpod_sample/3_Riverpod_and_StateNotifierProvider/stateController/counter_controller.dart';
+// 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -14,7 +14,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorProvider = ref.watch(ColorProvider);
+    final ColorState colorProvider = ref.watch(colorStateController);
 
     return Consumer(builder: (context, ref, child) {
       return MaterialApp(
@@ -32,8 +32,8 @@ class Home extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final counterProvider = ref.watch(CounterProvider);
-    final colorProvider = ref.watch(ColorProvider);
+    final CounterState counterProvider = ref.watch(counterStateController);
+    final ColorState colorProvider = ref.watch(colorStateController);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Counter and change color')),
@@ -52,7 +52,7 @@ class Home extends ConsumerWidget {
                 const SizedBox(height: 20),
                 ElevatedButton(
                     onPressed: () {
-                      colorProvider.changeColor();
+                      ref.read(colorStateController.notifier).colorChange();
                     },
                     child: const Text('Change color'))
               ],
@@ -65,13 +65,13 @@ class Home extends ConsumerWidget {
         children: [
           FloatingActionButton(
             onPressed: () {
-              counterProvider.increment();
+              ref.read(counterStateController.notifier).increment();
             },
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
-            onPressed: () => counterProvider.decrement(),
+            onPressed: () => ref.read(counterStateController.notifier).decrement(),
             child: const Icon(Icons.remove),
           ),
         ],
@@ -81,7 +81,7 @@ class Home extends ConsumerWidget {
 }
 
 
-// ■provider　×
+// ■1 provider　×
 // 1 定義
 //  Provider<String> _provider = Provider((ref) => 'You have pushed the button this many times:');
 //  Provider<String> _provider = Provider((ref) => ref.watch(anotherProider).state * 2);
@@ -90,7 +90,7 @@ class Home extends ConsumerWidget {
 // 3 変更
 //  できない
 
-// ■stateProvider
+// ■2 stateProvider
 // 1 定義
 //  StateProvider<int> counterProvider = StateProvider(((ref) => 0));
 // 2 表示
@@ -104,7 +104,7 @@ class Home extends ConsumerWidget {
 //  ref.read(_stateProvider.notifier).state = ref.read(_stateProvider) + 1;
 //  ref.read(_stateProvider.notifier).update((state) => state + 1);
 
-// ■StateNotifier 変数 + メソッド
+// ■3 StateNotifier 変数 + メソッド
 // 1 定義
 //  _provider = StateNotifierProvider<CounterNotifier, int>((ref) => CounterNotifier());
 
@@ -121,9 +121,10 @@ class Home extends ConsumerWidget {
 // 3 変更
 //  ref.watch(_provider.notifier).countUp(),
 
-// ■ChangeNotifierProvider
+// ■4 ChangeNotifierProvider
 // 1 定義
 //   final _provider = ChangeNotifierProvider((ref) => Counter());
+
 //   class Counter extends ChangeNotifier {
 //     int _counter = 0;
 //     get counter => _counter;
